@@ -209,21 +209,6 @@ public:
 			return tmp;
 		}
 	}
-	void resize(size_t n, char c = '\0')
-	{
-		reserve(n);
-		if (n < _capacity)
-		{
-			_str[n - 1] = '\0';
-		}
-		else
-		{
-			for (size_t i = _capacity; i < n; ++i)
-			{
-				_str[i] = c;
-			}
-		}
-	}
 
 private:
 	char* _str;
