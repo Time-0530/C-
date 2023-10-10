@@ -1,0 +1,30 @@
+https://leetcode.cn/problems/letter-combinations-of-a-phone-number/
+
+class Solution {
+private:
+    vector<string> s = {" ", " ", "abc", "def", "ghi", "jkl", "mno", "pqrs", "tuv", "wxyz"};
+public:
+    void Combination(string digits, int level, string str, vector<string>& v)
+    {
+        if (level == digits.size())
+        {
+            v.push_back(str);
+            return;
+        }
+        int num = digits[level] - '0';//得到对应的数字
+        string cstr = s[num];//得到数组中的字符串
+        for (size_t i = 0; i < s[num].size(); ++i)//每一行都有循环
+        {
+             Combination(digits, level + 1, str + cstr[i], v);
+        }
+    }
+    vector<string> letterCombinations(string digits) {
+        vector<string> v;
+        if (digits == "")
+        {
+            return v;
+        }
+        Combination(digits, 0, "", v);
+        return v;
+    }
+};
