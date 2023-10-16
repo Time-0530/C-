@@ -1,0 +1,23 @@
+class Solution {
+public:
+    int removeDuplicates(vector<int>& nums) {
+        //取得数组的长度
+        int length = nums.size();
+        //可以用双指针的方法操作
+        int src = 0;
+        int dst = 1;
+        while (dst < length)
+        {
+            if (nums[src] == nums[dst])
+            {
+                ++dst;
+            }
+            else
+            {
+                nums[++src] = nums[dst++];
+            }
+        }
+        //src就是下标
+        return src + 1;
+    }
+};
