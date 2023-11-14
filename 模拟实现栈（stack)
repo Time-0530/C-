@@ -1,0 +1,41 @@
+#include<vector>
+#include<list>
+#include<deque>
+
+
+using namespace std;
+
+
+namespace bit
+{
+	template<class T, class Container = deque<T>>
+	class stack {
+	public:
+		void push(const T& val)
+		{
+			_con.push_back(val);
+		}
+		void pop()
+		{
+			_con.pop_back();
+		}
+		T& top()
+		{
+			return _con.back();
+		}
+		size_t size() const
+		{
+			return _con.size();
+		}
+		bool empty() const
+		{
+			return _con.empty();
+		}
+		void swap(stack& st)
+		{
+			std::swap(_con, st._con);
+		}
+	private:
+		Container _con;
+	};
+}
