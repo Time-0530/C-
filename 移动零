@@ -1,0 +1,10 @@
+https://leetcode.cn/problems/move-zeroes/
+
+class Solution {
+public:
+    void moveZeroes(vector<int>& nums) {
+        for (int cur = 0, dest = -1; cur < nums.size(); cur++)//cur遍历整个数组就结束了
+            if (nums[cur])//遇到非零元素就交换
+                swap(nums[++dest], nums[cur]);
+    }
+};
