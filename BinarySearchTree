@@ -1,0 +1,110 @@
+#pragma once
+
+#include<iostream>
+
+using namespace std;
+
+//一个节点所具备的要素
+template<class K>
+struct BSTNode {
+	//增加一个新节点
+	BSTNode(const K& data)
+		:_left(nullptr)
+		,_right(nullptr)
+		,_key(data)
+	{
+		;
+	}
+	BSTNode<K>* _left;
+	BSTNode<K>* _right;
+	K _key;
+};
+
+//一个二叉搜索树的类
+template<class K>
+class BSTree
+{
+private:
+	BSTNode<K>* _root;
+
+	//作为子函数
+	void _InOrder(const BSTNode<K>* root)
+	{
+		//如果为空树，直接返回
+		if (root == nullptr)
+		{
+			return;
+		}
+		_InOrder(root->_left);
+		cout << root->_key << " ";
+		_InOrder(root->_right);
+	}
+public:
+	BSTree()
+		:_root(nullptr)
+	{
+		;
+	}
+
+	//插入数据
+	bool Insert(const K& key)
+	{
+		//如果为空树，直接创一个新节点赋值给_root
+		if (_root == nullptr)
+		{
+			_root = new BSTNode<K>(key);
+			return true;
+		}
+
+		BSTNode<K>* cur = _root;
+		BSTNode<K>* parent = _root;
+		//如果不是空树，进行情况讨论。
+		//只要当前节点不为空，就说明要进行比较
+		while (cur)
+		{
+			//插入的关键值小于当前的关键值，往右子树去
+			if (key > cur->_key)
+			{
+				parent = cur;
+				cur = cur->_right;
+			}
+			//插入的关键值小于当前的关键值，往左子树去
+			else if (key < cur->_key)
+			{
+				parent = cur;
+				cur = cur->_left;
+			}
+			else
+			{
+				return false;
+			}
+		}
+
+		//此时当前节点为空，所以进行插入关键值。但是不知道此时节点的上一个节点是谁？
+		// 所以在开始要设置一个节点parent
+		//虽然知道在parent后插入关键值，但是不知道在左子树还是右子树？
+		//所以还要进行比较
+		if (key > parent->_key)
+		{
+			BSTNode<K>* node = new BSTNode<K>(key);
+			parent->_right = node;
+		}
+		else
+		{
+			BSTNode<K>* node = new BSTNode<K>(key);
+			parent->_left = node;
+		}
+		return true;
+	}
+	//中序遍历
+	void InOrder()
+	{
+		_InOrder(_root);
+		cout << endl;
+	}
+
+	~BSTree()
+	{
+		delete _root;
+	}
+};
