@@ -1,0 +1,359 @@
+#pragma once
+
+#include<iostream>
+
+using namespace std;
+
+//一个节点所具备的要素
+template<class K>
+struct BSTNode {
+	//增加一个新节点
+	BSTNode(const K& data)
+		:_left(nullptr)
+		,_right(nullptr)
+		,_key(data)
+	{
+		;
+	}
+	BSTNode<K>* _left;
+	BSTNode<K>* _right;
+	K _key;
+};
+
+//一个二叉搜索树的类
+template<class K>
+class BSTree
+{
+private:
+	BSTNode<K>* _root;
+
+	//作为中序函数的子函数
+	void _InOrder(const BSTNode<K>* root)
+	{
+		//如果为空树，直接返回
+		if (root == nullptr)
+		{
+			return;
+		}
+		_InOrder(root->_left);
+		cout << root->_key << " ";
+		_InOrder(root->_right);
+	}
+
+	//作为析构函数的子函数
+	void _Destructor(BSTNode<K>* root)
+	{
+		if (root == nullptr)
+		{
+			return;
+		}
+		_Destructor(root->_left);
+		_Destructor(root->_right);
+		delete root;
+	}
+
+	//作为递归版查找函数的子函数
+	bool _FindR(BSTNode<K>* root, const K& key)
+	{
+		//如果为空树就不找了
+		if (root == nullptr)
+		{
+			return false;
+		}
+		//使用前序遍历寻找方便，符合二叉搜索树的查询逻辑
+		if (root->_key > key)
+		{
+			_FindR(root->_left, key);
+		}
+		else
+		{
+			_FindR(root->_right, key);
+		}
+		return true;
+	}
+
+	//作为递归版插入函数的子函数
+	bool _InsertR(BSTNode<K>*& root, const K& key)
+	{
+		//如果为空树，直接弄一个新节点初始化并赋值给root
+		//但是如何将空节点和它的父节点链接呢？
+		//可以使用指针引用，这样就可以修改节点的值了
+		if (root == nullptr)
+		{
+			root = new BSTNode<K>(key);
+			return true;
+		}
+		//不为空树，找到要插入的节点
+		if (key < root->_key)
+		{
+			_InsertR(root->_left, key);
+		}
+		else if (key > root->_key)
+		{
+			_InsertR(root->_right, key);
+		}
+		return false;
+	}
+
+	//递归版删除函数的子函数
+	bool _EraseR(BSTNode<K>*& root, const K& key)
+	{
+		//如果为空树，就直接返回
+		if (root == nullptr)
+		{
+			return false;
+		}
+		//要找到删除的节点
+		if (key < root->_key)
+		{
+			_EraseR(root->_left, key);
+		}
+		else if (key > root->_key)
+		{
+			_EraseR(root->_right, key);
+		}
+		//找到了要删除的节点
+		else
+		{
+			if (root->_left == nullptr)
+			{
+				BSTNode<K>* node = root;
+				root = root->_right;
+				delete node;
+				return true;
+			}
+			else if (root->_right == nullptr)
+			{
+				BSTNode<K>* node = root;
+				root = root->_left;
+				delete node;
+				return true;
+			}
+			else
+			{
+				BSTNode<K>* left_max = root->_left;
+				BSTNode<K>* node = root;
+				while (left_max->_right)
+				{
+					left_max = left_max->_right;
+				}
+				swap(root->_key, left_max->_key);
+				left_max->_left = root->_left;
+				root = left_max;
+				delete node;
+				return true;
+			}
+		}
+	}
+public:
+	typedef BSTNode<K> Node;
+	BSTree()
+		:_root(nullptr)
+	{}
+
+	//插入数据
+	bool Insert(const K& key)
+	{
+		//如果为空树，直接创一个新节点赋值给_root
+		if (_root == nullptr)
+		{
+			_root = new Node(key);
+			return true;
+		}
+
+		Node* cur = _root;
+		Node* parent = _root;
+		//如果不是空树，进行情况讨论。
+		//只要当前节点不为空，就说明要进行比较
+		while (cur)
+		{
+			//插入的关键值小于当前的关键值，往右子树去
+			if (key > cur->_key)
+			{
+				parent = cur;
+				cur = cur->_right;
+			}
+			//插入的关键值小于当前的关键值，往左子树去
+			else if (key < cur->_key)
+			{
+				parent = cur;
+				cur = cur->_left;
+			}
+			else
+			{
+				return false;
+			}
+		}
+
+		//此时当前节点为空，所以进行插入关键值。但是不知道此时节点的上一个节点是谁？
+		// 所以在开始要设置一个节点parent
+		//虽然知道在parent后插入关键值，但是不知道在左子树还是右子树？
+		//所以还要进行比较
+		if (key > parent->_key)
+		{
+			Node* node = new Node(key);
+			parent->_right = node;
+		}
+		else
+		{
+			Node* node = new Node(key);
+			parent->_left = node;
+		}
+		return true;
+	}
+
+	//插入数据的递归版本
+	bool InsertR(const K& key)
+	{
+		return _InsertR(_root, key);
+	}
+
+	//查找数据
+	bool Find(const K& key)
+	{
+		//如果为空树，就不用找了
+		if (_root == nullptr)
+		{
+			return false;
+		}
+		//不为空就开始分情况讨论
+		Node* cur = _root;
+		while (cur)
+		{
+			//寻找的关键值大于当前的关键值，往右子树走
+			if (key > cur->_key)
+			{
+				cur = cur->_right;
+			}
+			//寻找的关键值小于当前的关键值，往左子树走
+			else if (key < cur->_key)
+			{
+				cur = cur->_left;
+			}
+			//寻找的关键值等于当前的关键值，找到了就返回
+			else
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	//查找数据的递归版本
+	bool FindR(const K& key)
+	{
+		return _FindR(_root, key);
+	}
+
+	//删除数据
+	bool Erase(const K& key)
+	{
+		//空树就返回
+		if (_root == nullptr)
+		{
+			return false;
+		}
+		//找到要删除的位置
+		Node* cur = _root;
+		Node* parent = nullptr;
+		while (cur)
+		{
+			if (key > cur->_key)
+			{
+				parent = cur;
+				cur = cur->_right;
+			}
+			else if (key < cur->_key)
+			{
+				parent = cur;
+				cur = cur->_left;
+			}
+			//找到了就跳出循环
+			else
+			{
+				break;
+			}
+		}
+		//没找到就返回
+		if (cur == nullptr)
+		{
+			return false;
+		}
+		//进行删除操作
+		//有一个子树或者没有子树可以结合分析
+
+		//只有右子树或者没有子树
+		if (cur->_left == nullptr)
+		{
+			//cur在parent的左边
+			if (cur->_key < parent->_key)
+			{
+				parent->_left = cur->_right;
+				delete cur;
+				return true;
+			}
+			//cur在parent的右边
+			else
+			{
+				parent->_right = cur->_right;
+				delete cur;
+				return true;
+			}
+		}
+		//只有左子树或者没有子树（当然在第一种情况中就排除了）
+		else if (cur->_right == nullptr)
+		{
+			//cur在parent的左边
+			if (cur->_key < parent->_key)
+			{
+				parent->_left = cur->_left;
+				delete cur;
+				return true;
+			}
+			//cur在parent的右边
+			else
+			{
+				parent->_right = cur->_left;
+				delete cur;
+				return true;
+			}
+		}
+		//待删除的节点有左右子树怎么办？
+		//找出左子树中具有最大键值或者右子树中具有最小键值的节点与之交换
+		else
+		{
+			//找出左子树的最大节点
+			Node* left_max = cur->_left;
+			while (left_max->_right)
+			{
+				parent = left_max;
+				left_max = left_max->_right;
+			}
+			//找到了左子树最大的节点,交换两个节点的关键值
+			swap(left_max->_key, cur->_key);
+			//左子树最大节点可能会有左子树，所以要接到父亲的右子树
+			parent->_right = left_max->_left;
+			delete left_max;
+			return true;
+		}
+
+	}
+	
+	//删除数据函数的递归版本
+	bool EraseR(const K& key)
+	{
+		return _EraseR(_root, key);
+	}
+	//中序遍历
+	void InOrder()
+	{
+		_InOrder(_root);
+		cout << endl;
+	}
+
+	//析构函数
+	~BSTree()
+	{
+		_Destructor(_root);
+	}
+};
