@@ -1,0 +1,30 @@
+#include <iostream>
+#include<vector>
+#include<algorithm>
+using namespace std;
+
+int main()
+{
+    int n = 0;
+    scanf("%d", &n);
+    vector<int> nums(3 * n);
+    for (int i = 0; i < 3 * n; ++i)
+    {
+        scanf("%d", &nums[i]);
+    }
+    //进行排序
+    sort(nums.begin(), nums.end());
+    int j = nums.size();
+    //水平值总和有可能超过整形的的最大值，所以要使用long int
+    long int hvSum = 0;//horizontal values水平值 
+    for (int i = 0; i < n; ++i)
+    {
+        hvSum += nums[j - 2];
+        j -= 2;
+    }
+    cout << hvSum;
+    return 0;
+}
+
+
+https://www.nowcoder.com/questionTerminal/6736cc3ffd1444a4a0057dee89be789b?orderByHotValue=1&page=1&onlyReference=false
