@@ -1,0 +1,67 @@
+#pragma once
+
+#include<string.h>
+
+class String
+{
+public:
+	//迭代器
+	typedef char* iterator;
+	iterator begin()
+	{
+		return _str;
+	}
+	iterator end()
+	{
+		return &_str[_size];
+	  //return _str + _size;
+	}
+	//构造函数
+	String(const char* str = "")
+		:_str(new char[strlen(str) + 1])// 错误的写成:strlen(str + 1)
+		, _size(strlen(str))
+		, _capacity(_size)
+	{
+		strcpy(_str, str);
+	}
+	//析构函数
+	~String()
+	{
+		delete[] _str;
+		_str = nullptr;
+		_size = _capacity = 0;
+	}
+	//返回字符串的指针
+	const char* c_str() const
+	{
+		return _str;
+	}
+	const size_t c_size() const
+	{
+		return _size;
+	}
+	//拷贝构造函数
+	String(const String& s)
+	{
+		//为什么不直接：_str = s._str？
+		//析构函数中使用了delete
+		_str = new char[strlen(s._str) + 1];
+		strcpy(_str, s._str);
+		_size = s._size;
+		_capacity = s._capacity;
+	}
+	//运算符重载
+	char& operator[](size_t pos)
+	{
+		return _str[pos];
+	}
+	const char& operator[](size_t pos) const
+	{
+		return _str[pos];
+	}
+
+private:
+	char* _str;
+	size_t _size;
+	size_t _capacity;
+};

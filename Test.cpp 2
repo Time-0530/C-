@@ -1,0 +1,92 @@
+#define _CRT_SECURE_NO_WARNINGS
+
+#include"string.h"
+
+
+
+void test1()
+{
+	String s1("hello world!");
+	cout << s1.c_str() << endl;
+	String s2(s1);
+	cout << s2.c_str() << endl;
+	String s3 = s1;
+	cout << s3.c_str() << endl;
+	//循环遍历
+	for (size_t i = 0; i < s1.c_size(); i++)
+	{
+		cout << s1[i];
+	}
+	cout << endl;
+	//迭代器
+	auto it = s1.begin();
+  //String::iterator it = s1.begin();
+	while (it != s1.end())
+	{
+		cout << *it;
+		++it;
+	}
+	cout << endl;
+	//范围for
+	for (auto ch : s1)
+	{
+		cout << ch;
+	}
+	cout << endl;
+	//范围for和迭代器在底层代码是相同的
+}
+
+void test2()
+{
+	String s1("hello world");
+	s1.append("!!!");
+	cout << s1.c_str() << endl;
+	String s2("hello world");
+	s2.push_back('!');
+	cout << s2.c_str() << endl;
+}
+
+void test3()
+{
+	String s1("hello world");
+	s1.erase(5, 5);
+	cout << s1.c_str() << endl;
+}
+
+void test4()
+{
+	String s1("hello world");
+	cout << s1.find("world") << endl;
+	String s2("hello world");
+	cout << s1.find('w') << endl;
+}
+
+void test5()
+{
+	String s1("hello world");
+	s1.insert(11, "!!!");
+	cout << s1.c_str() << endl;
+	String s2(s1);
+	s1.insert(0, 3, '!');
+	cout << s2.c_str() << endl;
+}
+
+void test6()
+{
+	String s1("hello world");
+	//cin >> s1;
+	//cout << s1;
+	cout << s1.substr(1, 5) << endl;
+	cout << s1.substr(1) << endl;
+}
+
+int main()
+{
+	//test1();
+	//test2();
+	//test3();
+	//test4();
+	//test5();
+	test6();
+	return 0;
+}

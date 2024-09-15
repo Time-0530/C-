@@ -1,0 +1,232 @@
+#pragma once
+
+using namespace std;
+
+#include<string.h>
+#include<assert.h>
+#include<iostream>
+
+class String
+{
+	friend ostream& operator<<(ostream& os, const String& s);
+	friend istream& operator>>(istream& os, String& s);
+public:
+	
+	//迭代器
+	typedef char* iterator;
+	typedef const char* const_iterator;
+	iterator begin()
+	{
+		return _str;
+	}
+	iterator end()
+	{
+		return &_str[_size];
+		//return _str + _size;
+	}
+	const_iterator begin() const
+	{
+		return _str;
+	}
+	const_iterator end() const
+	{
+		return &_str[_size];
+	}
+	//构造函数
+	String(const char* str = "")
+		:_str(new char[strlen(str) + 1])// 错误的写成:strlen(str + 1)
+		, _size(strlen(str))
+		, _capacity(_size)
+	{
+		strcpy(_str, str);
+	}
+	//析构函数
+	~String()
+	{
+		delete[] _str;
+		_str = nullptr;
+		_size = _capacity = 0;
+	}
+	//返回字符串的指针
+	const char* c_str() const
+	{
+		return _str;
+	}
+	const size_t c_size() const
+	{
+		return _size;
+	}
+	const size_t c_capacity() const
+	{
+		return _capacity;
+	}
+	//拷贝构造函数
+	String(const String& s)
+	{
+		//为什么不直接：_str = s._str？
+		//析构函数中使用了delete
+		_str = new char[strlen(s._str) + 1];
+		strcpy(_str, s._str);
+		_size = s._size;
+		_capacity = s._capacity;
+	}
+	String& operator=(const String& s)
+	{
+		_str = s._str;
+		_size = s._size;
+		_capacity = s._capacity;
+		return *this;
+	}
+	//运算符重载
+	char& operator[](size_t pos)
+	{
+		return _str[pos];
+	}
+	const char& operator[](size_t pos) const
+	{
+		return _str[pos];
+	}
+	//扩容函数
+	void reserve(size_t n = 0)
+	{
+		if (n > _capacity)//加个条件不用执行多余操作
+		{
+			char* tmp = new char[n + 1];
+			strcpy(tmp, _str);
+			delete[] _str;
+			_str = tmp;
+			_capacity = n;
+		}
+	}
+	//追加字符串
+	String& append(const char* s)
+	{
+		size_t len = strlen(s);
+		if (_size + len > _capacity)
+		{
+			reserve(_capacity + len);
+			strcat(_str, s);
+			_size = strlen(_str);
+		}
+		return *this;
+	}
+	//*追加一个字符*
+	String& push_back(char c)
+	{
+		if (_size + 1 > _capacity)
+		{
+			reserve(_capacity + 1);
+			_str[_size] = c;
+			_str[_size + 1] = '\0';
+			++_size;
+		}
+		return *this;
+	}
+	//在某个位置插入字符
+	String& insert(size_t pos, const char* s)
+	{
+		assert(pos <= _size);
+		size_t len = strlen(s);
+		reserve(_capacity + len);
+		size_t end = _size;
+		while (end >= pos && end != -1)
+		{
+			_str[end + len] = _str[end];
+			--end;
+		}
+		while (len--)
+		{
+			_str[pos++] = *s;
+			++s;
+		}
+		return *this;
+	}
+	String& insert(size_t pos, size_t n, char c)
+	{
+		assert(pos <= _size);
+		reserve(_capacity + n);
+		size_t end = _size;
+		while (end >= pos && end != -1)
+		{
+			_str[end + n] = _str[end];
+			--end;
+		}
+		while (n--)
+		{
+			_str[pos++] = c;
+		}
+		return *this;
+	}
+
+	//删除字符
+	String& erase(size_t pos = 0, size_t len = npos)
+	{
+		assert(pos < _size);
+		if (len != npos)
+		{
+			for (size_t i = len + pos - 1; i < _size; ++i)
+			{
+				_str[pos++] = _str[i];
+			}
+		}
+		_str[pos] = '\0';
+		_size = strlen(_str);
+		return *this;
+	}
+
+	//查找字符
+	size_t find(const char* s, size_t pos = 0) const
+	{
+		return strstr(_str + pos, s) - _str;
+	}
+	size_t find(char c, size_t pos = 0) const
+	{
+		return strchr(_str, c) - _str;
+	}
+	//查找对应的字符串
+	String substr(size_t pos = 0, size_t len = npos) const
+	{
+		assert(pos <= _size); 
+		if (len != npos)
+		{
+			char* tmp = new char[len + 1];
+			size_t n = 0;
+			for (size_t i = pos; i <= pos + len - 1; ++i)
+			{
+				tmp[n++] = _str[i];
+			}
+			tmp[len] = '\0';
+			return tmp;
+		}
+		else
+		{
+			char* tmp = new char[_capacity - pos + 1];
+			size_t n = 0;
+			for (size_t i = pos; i <= _capacity; ++i)
+			{
+				tmp[n++] = _str[i];
+			}
+			return tmp;
+		}
+	}
+
+private:
+	char* _str;
+	size_t _size;
+	size_t _capacity;
+	static size_t npos;
+};
+size_t String::npos = -1;
+
+ostream& operator<<(ostream& os, const String& s)
+{
+	os << s._str;
+	return os;
+}
+
+istream& operator>>(istream& is, String& s)
+{
+	
+	is >> s._str;
+	return is;
+}
